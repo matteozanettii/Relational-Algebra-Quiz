@@ -30,6 +30,13 @@
     .katex {
       font-size: 1.05em;
     }
+    /* Hide default details marker */
+    details > summary {
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen antialiased flex flex-col selection:bg-sky-500 selection:text-white">
@@ -56,6 +63,12 @@
           <span class="text-slate-400">Score:</span>
           <span id="score-badge" class="text-emerald-400 font-bold font-mono">0% (0/0)</span>
         </div>
+
+        <!-- GitHub Repository Link -->
+        <a href="https://github.com/matteozanettii/Relational-Algebra-Quiz/" target="_blank" rel="noopener noreferrer" class="text-xs bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 font-medium rounded-xl px-3.5 py-2 border border-slate-700 transition flex items-center gap-1.5 shadow-md">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+          Contribute on GitHub
+        </a>
 
         <button id="shuffle-restart-btn" class="text-xs bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-semibold rounded-xl px-3.5 py-2 transition-all flex items-center gap-1.5 shadow-md shadow-sky-950/50">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -104,11 +117,33 @@
   </footer>
 
   <script>
+    const schema1 = [
+      "Suppliers(sID, sName, address)",
+      "Parts(pID, pName, colour)",
+      "Catalog(sID, pID, price)"
+    ];
+    
+    const schema2 = [
+      "employee(ID, person_name, street, city)",
+      "works(ID, company_name, salary)",
+      "company(company_name, city)"
+    ];
+
+    const schema3 = [
+      "branch(branch_name, branch_city, assets)",
+      "customer(ID, customer_name, customer_street, customer_city)",
+      "loan(loan_number, branch_name, amount)",
+      "borrower(ID, loan_number)",
+      "account(account_number, branch_name, balance)",
+      "depositor(ID, account_number)"
+    ];
+
     const rawQuestionsData = [
       {
         id: 1,
         title: "Exercise 1 — Key Constraints",
         slide: "Slide 4",
+        schema: ["Instructor(ID, name, dept_name, salary)"],
         prompt: "In the instance of Instructor shown in the slides, no two instructors have the same name. From this instance alone, can we conclude that `name` can be used as a superkey (or primary key) of `Instructor`?",
         options: [
           { id: "1a", text: "No. A key constraint is a semantic rule that must hold across all legal instances over time, not an accidental uniqueness property of a single database state.", correct: true },
@@ -122,6 +157,7 @@
         id: 2,
         title: "Exercise 2 — Natural Join Semantics",
         slide: "Slide 5",
+        schema: ["Employee(Name, EmpId, DeptName)", "Department(DeptName, Manager)"],
         prompt: "Given `Employee(Name, EmpId, DeptName)` with 4 tuples (Harry/Finance, Sally/Sales, George/Finance, Harriet/Sales) and `Department(DeptName, Manager)` with 3 tuples (Finance/George, Sales/Harriet, Production/Charles), compute $\\text{Employee} \\bowtie \\text{Department}$. What is the result schema and tuple count?",
         options: [
           { id: "2a", text: "Schema (Name, EmpId, DeptName, Manager) with 4 tuples.", correct: true },
@@ -135,7 +171,8 @@
         id: 3,
         title: "Exercise 3 — Selection on Single Relation",
         slide: "Slide 7 (Schema 1)",
-        prompt: "Given Schema 1: `Suppliers(sID, sName, address)`, `Parts(pID, pName, colour)`, `Catalog(sID, pID, price)`. Find all red parts.",
+        schema: schema1,
+        prompt: "Given Schema 1: Find all red parts.",
         options: [
           { id: "3a", text: "$\\sigma_{\\text{colour} = 'red'}(\\text{Parts})$", correct: true },
           { id: "3b", text: "$\\pi_{\\text{colour} = 'red'}(\\text{Parts})$", correct: false },
@@ -148,6 +185,7 @@
         id: 4,
         title: "Exercise 4 — Projection & Selection",
         slide: "Slide 8 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find the names of all red parts.",
         options: [
           { id: "4a", text: "$\\pi_{pName}(\\sigma_{\\text{colour} = 'red'}(\\text{Parts}))$", correct: true },
@@ -161,6 +199,7 @@
         id: 5,
         title: "Exercise 5 — Disjunction (OR Condition)",
         slide: "Slide 9 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find the names of all parts which are either red or green.",
         options: [
           { id: "5a", text: "$\\pi_{pName}(\\sigma_{\\text{colour} = 'red' \\lor \\text{colour} = 'green'}(\\text{Parts}))$", correct: true },
@@ -174,6 +213,7 @@
         id: 6,
         title: "Exercise 6 — Join Across Multiple Tables",
         slide: "Slide 10 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find all prices for parts that are red or green. (A part may have different prices from different manufacturers.)",
         options: [
           { id: "6a", text: "$\\pi_{\\text{price}}(\\text{Catalog} \\bowtie \\sigma_{\\text{colour} = 'red' \\lor \\text{colour} = 'green'}(\\text{Parts}))$", correct: true },
@@ -187,6 +227,7 @@
         id: 7,
         title: "Exercise 7 — Supplier IDs with Matching Parts",
         slide: "Slide 11 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find the sIDs of all suppliers who supply a part that is red or green.",
         options: [
           { id: "7a", text: "$\\pi_{sID}(\\text{Catalog} \\bowtie \\sigma_{\\text{colour} = 'red' \\lor \\text{colour} = 'green'}(\\text{Parts}))$", correct: true },
@@ -200,6 +241,7 @@
         id: 8,
         title: "Exercise 8 — Supplier Supplying Both Colours",
         slide: "Slide 12 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find the sIDs of all suppliers who supply a part that is red and green (i.e., who supply at least one red part AND at least one green part).",
         options: [
           { id: "8a", text: "$\\pi_{sID}(\\text{Catalog} \\bowtie \\sigma_{\\text{colour} = 'red'}(\\text{Parts})) \\cap \\pi_{sID}(\\text{Catalog} \\bowtie \\sigma_{\\text{colour} = 'green'}(\\text{Parts}))$", correct: true },
@@ -213,6 +255,7 @@
         id: 9,
         title: "Exercise 9 — Three-way Join for Supplier Names",
         slide: "Slide 13 (Schema 1)",
+        schema: schema1,
         prompt: "Given Schema 1: Find the names of all suppliers who supply a part that is red or green.",
         options: [
           { id: "9a", text: "$\\pi_{sName}(\\text{Suppliers} \\bowtie \\text{Catalog} \\bowtie \\sigma_{\\text{colour} = 'red' \\lor \\text{colour} = 'green'}(\\text{Parts}))$", correct: true },
@@ -226,7 +269,8 @@
         id: 10,
         title: "Exercise 10 — Schema 2 Full Tuples",
         slide: "Slide 16 (Schema 2)",
-        prompt: "Given Schema 2: `employee(ID, person_name, street, city)`, `works(ID, company_name, salary)`, `company(company_name, city)`. Find all employees who live in the city 'Miami'.",
+        schema: schema2,
+        prompt: "Given Schema 2: Find all employees who live in the city 'Miami'.",
         options: [
           { id: "10a", text: "$\\sigma_{\\text{city} = 'Miami'}(\\text{employee})$", correct: true },
           { id: "10b", text: "$\\pi_{\\text{city} = 'Miami'}(\\text{employee})$", correct: false },
@@ -239,6 +283,7 @@
         id: 11,
         title: "Exercise 11 — Employee Name Projection",
         slide: "Slide 17 (Schema 2)",
+        schema: schema2,
         prompt: "Given Schema 2: Find the name of each employee who lives in the city 'Miami'.",
         options: [
           { id: "11a", text: "$\\pi_{person\\_name}(\\sigma_{\\text{city} = 'Miami'}(\\text{employee}))$", correct: true },
@@ -252,6 +297,7 @@
         id: 12,
         title: "Exercise 12 — Joining Employee and Works",
         slide: "Slide 18 (Schema 2)",
+        schema: schema2,
         prompt: "Given Schema 2: Find the name of each employee whose salary is greater than 100000.",
         options: [
           { id: "12a", text: "$\\pi_{person\\_name}(\\text{employee} \\bowtie \\sigma_{\\text{salary} > 100000}(\\text{works}))$", correct: true },
@@ -265,6 +311,7 @@
         id: 13,
         title: "Exercise 13 — Compound Condition Across Tables",
         slide: "Slide 19 (Schema 2)",
+        schema: schema2,
         prompt: "Given Schema 2: Find the name of each employee who lives in the city 'Miami' and whose salary is greater than 100000.",
         options: [
           { id: "13a", text: "$\\pi_{person\\_name}(\\sigma_{\\text{city} = 'Miami'}(\\text{employee}) \\bowtie \\sigma_{\\text{salary} > 100000}(\\text{works}))$", correct: true },
@@ -278,7 +325,8 @@
         id: 14,
         title: "Exercise 14 — Schema 3 Branch Selection",
         slide: "Slide 21 (Schema 3)",
-        prompt: "Given Schema 3: `branch(branch_name, branch_city, assets)`, `customer(ID, customer_name, customer_street, customer_city)`, `loan(loan_number, branch_name, amount)`, `borrower(ID, loan_number)`. Find the name of each branch located in 'Chicago'.",
+        schema: schema3,
+        prompt: "Given Schema 3: Find the name of each branch located in 'Chicago'.",
         options: [
           { id: "14a", text: "$\\pi_{branch\\_name}(\\sigma_{branch\\_city = 'Chicago'}(branch))$", correct: true },
           { id: "14b", text: "$\\sigma_{branch\\_name}(\\pi_{branch\\_city = 'Chicago'}(branch))$", correct: false },
@@ -291,6 +339,7 @@
         id: 15,
         title: "Exercise 15 — Borrower with Branch Loan",
         slide: "Slide 22 (Schema 3)",
+        schema: schema3,
         prompt: "Given Schema 3: Find the ID of each borrower who has a loan in the branch 'Downtown'.",
         options: [
           { id: "15a", text: "$\\pi_{ID}(borrower \\bowtie \\sigma_{branch\\_name = 'Downtown'}(loan))$", correct: true },
@@ -304,7 +353,12 @@
         id: 16,
         title: "Exercise 16 — Universal Negation (Set Difference)",
         slide: "Slide 23",
-        prompt: "Given `SAILORS(sID, sName, Seniority, DateOfBirth)`, `BOOKINGS(sID, bID, Date)`, `BOATS(bID, BName, Colour)`. Find the names of the sailors who never booked red boats.",
+        schema: [
+          "SAILORS(sID, sName, Seniority, DateOfBirth)",
+          "BOOKINGS(sID, bID, Date)",
+          "BOATS(bID, BName, Colour)"
+        ],
+        prompt: "Given `SAILORS`, `BOOKINGS`, and `BOATS`: Find the names of the sailors who never booked red boats.",
         options: [
           { id: "16a", text: "$\\pi_{sName}(SAILORS \\bowtie (\\pi_{sID}(SAILORS) - \\pi_{sID}(BOOKINGS \\bowtie \\sigma_{Colour = 'red'}(BOATS))))$", correct: true },
           { id: "16b", text: "$\\pi_{sName}(SAILORS \\bowtie BOOKINGS \\bowtie \\sigma_{Colour \\neq 'red'}(BOATS))$", correct: false },
@@ -317,7 +371,11 @@
         id: 17,
         title: "Exercise 17 — Set Difference on Dates",
         slide: "Slide 24",
-        prompt: "Given `SHOW(sID, Title, Company, Duration)` and `SCHEDULE(Date, StartingTime, sID, TheatreName)`. Find the names of the companies that acted in shows on 15/10/2003 but not on 23/10/2003.",
+        schema: [
+          "SHOW(sID, Title, Company, Duration)",
+          "SCHEDULE(Date, Starting Time, sID, TeathreName)"
+        ],
+        prompt: "Given `SHOW` and `SCHEDULE`: Find the names of the companies that acted in shows on 15/10/2003 but not on 23/10/2003.",
         options: [
           { id: "17a", text: "$\\pi_{Company}(SHOW \\bowtie \\sigma_{Date = '15/10/2003'}(SCHEDULE)) - \\pi_{Company}(SHOW \\bowtie \\sigma_{Date = '23/10/2003'}(SCHEDULE))$", correct: true },
           { id: "17b", text: "$\\pi_{Company}(SHOW \\bowtie \\sigma_{Date = '15/10/2003' \\land Date \\neq '23/10/2003'}(SCHEDULE))$", correct: false },
@@ -330,7 +388,12 @@
         id: 18,
         title: "Exercise 18 — Theta-Join Self-Matching",
         slide: "Slide 25",
-        prompt: "Given `FILM(fID, Title, Director, Year, RentingPrice)`, `ACTORS(aID, Surname, Name, DateOfBirth, Nationality)`, `ROLES(fID, aID, Character)`. Find the titles of the films in which the director also played a role as an actor.",
+        schema: [
+          "FILM(fID, Title, Director, Year, RentingPrice)",
+          "ACTORS(aID, Surname, Name, DateOfBirth, Nationality)",
+          "ROLES(fID, aID, Character)"
+        ],
+        prompt: "Given `FILM`, `ACTORS`, and `ROLES`: Find the titles of the films in which the director also played a role as an actor.",
         options: [
           { id: "18a", text: "$\\pi_{Title}(FILM \\bowtie_{FILM.fID = ROLES.fID \\land Director = Surname}(ROLES \\bowtie ACTORS))$", correct: true },
           { id: "18b", text: "$\\pi_{Title}(\\sigma_{Director = Character}(FILM \\bowtie ROLES))$", correct: false },
@@ -343,7 +406,12 @@
         id: 19,
         title: "Exercise 19 — Chained Explicit Joins",
         slide: "Slide 26",
-        prompt: "Given `DRUG(Code, DrugName, ActiveIngredient, Producer, Price)`, `PRODUCERS(ProducerCode, Name, Country)`, `SUBSTANCES(ID, SubstanceName, Category)`. Find for the drugs with an Italian producer, the names of the drugs and the names of the substances of their active ingredient.",
+        schema: [
+          "DRUG(Code, DrugName, ActiveIngredient, Producer, Price)",
+          "PRODUCERS(ProducerCode, Name, Country)",
+          "SUBSTANCES(ID, SubstanceName, Category)"
+        ],
+        prompt: "Given `DRUG`, `PRODUCERS`, and `SUBSTANCES`: Find for the drugs with an Italian producer, the names of the drugs and the names of the substances of their active ingredient.",
         options: [
           { id: "19a", text: "$\\pi_{DrugName, SubstanceName}((\\sigma_{Country = 'Italy'}(PRODUCERS) \\bowtie_{ProducerCode = Producer} DRUG) \\bowtie_{ActiveIngredient = ID} SUBSTANCES)$", correct: true },
           { id: "19b", text: "$\\pi_{DrugName, ActiveIngredient}(DRUG \\bowtie_{Producer = ProducerCode} \\sigma_{Country = 'Italy'}(PRODUCERS))$", correct: false },
@@ -383,9 +451,9 @@
           id: q.id,
           title: q.title,
           slide: q.slide,
+          schema: q.schema,
           prompt: q.prompt,
           explanation: q.explanation,
-          // CRITICAL: Shuffle options so the correct answer moves dynamically
           options: fisherYatesShuffle(q.options)
         };
       });
@@ -460,6 +528,25 @@
           `;
         }).join('');
 
+        // Schema toggler logic
+        let schemaHtml = '';
+        if (q.schema && q.schema.length > 0) {
+          const schemaList = q.schema.map(table => `<li>${table}</li>`).join('');
+          schemaHtml = `
+            <details class="mb-5 group">
+              <summary class="cursor-pointer text-[13px] font-semibold text-sky-400 bg-sky-950/30 border border-sky-900/50 rounded-lg px-3.5 py-2.5 inline-flex items-center gap-2 select-none hover:bg-sky-900/40 transition-colors shadow-sm">
+                <svg class="w-4 h-4 text-sky-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                View Database Schema Tables
+              </summary>
+              <div class="mt-2.5 p-4 bg-slate-950/60 border border-slate-800/80 rounded-xl shadow-inner font-mono text-[12px] sm:text-xs text-slate-300">
+                <ul class="space-y-1.5 list-disc list-inside marker:text-slate-600">
+                  ${schemaList}
+                </ul>
+              </div>
+            </details>
+          `;
+        }
+
         // Feedback card
         let feedbackHtml = '';
         if (isAnswered) {
@@ -482,7 +569,8 @@
             </div>
             <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/60">${q.slide}</span>
           </div>
-          <div class="text-slate-100 font-medium text-sm sm:text-base mb-4 leading-relaxed">${q.prompt}</div>
+          <div class="text-slate-100 font-medium text-sm sm:text-base mb-3 leading-relaxed">${q.prompt}</div>
+          ${schemaHtml}
           <div class="space-y-2.5">${optionsHtml}</div>
           ${feedbackHtml}
         `;
