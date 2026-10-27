@@ -468,6 +468,15 @@
 
     function renderQuiz() {
       const container = document.getElementById('quiz-container');
+
+      // Preserve each question's schema toggle state before re-rendering
+      const schemaStates = new Map(
+        [...container.querySelectorAll('.schema-toggle')].map(details => [
+          details.dataset.questionId,
+          details.open
+        ])
+      );
+
       container.innerHTML = '';
 
       activeQuestions.forEach((q, qIndex) => {
@@ -533,7 +542,7 @@
         if (q.schema && q.schema.length > 0) {
           const schemaList = q.schema.map(table => `<li>${table}</li>`).join('');
           schemaHtml = `
-            <details class="mb-5 group">
+            <details data-question-id="${q.id}" class="schema-toggle mb-5 group">
               <summary class="cursor-pointer text-[13px] font-semibold text-sky-400 bg-sky-950/30 border border-sky-900/50 rounded-lg px-3.5 py-2.5 inline-flex items-center gap-2 select-none hover:bg-sky-900/40 transition-colors shadow-sm">
                 <svg class="w-4 h-4 text-sky-500 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 View Database Schema Tables
@@ -576,6 +585,13 @@
         `;
 
         container.appendChild(card);
+
+        // Restore this question's schema toggle state
+        const schemaToggle = card.querySelector('.schema-toggle');
+
+        if (schemaToggle && schemaStates.has(String(q.id))) {
+            schemaToggle.open = schemaStates.get(String(q.id));
+        }
       });
 
       renderMathFormulas();
